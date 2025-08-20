@@ -1,4 +1,4 @@
-# Financial Fraud Detection
+# Financial Fraud Detection project
 
 Terraform project for AWS Glue-based fraud detection system.
 
