@@ -1,0 +1,4 @@
+aws_region      = "us-east-1"
+project_name    = "fraud-detection"
+environment     = "dev"
+lambda_zip_path = "../lambda/fraud_investigator.zip"

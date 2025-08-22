@@ -15,3 +15,9 @@ variable "environment" {
   type        = string
   default     = "dev"
 }
+
+variable "lambda_zip_path" {
+  description = "Path to Lambda deployment package"
+  type        = string
+  default     = "../lambda/fraud_investigator.zip"
+}
