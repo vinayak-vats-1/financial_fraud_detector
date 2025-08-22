@@ -8,6 +8,16 @@ output "glue_job_name" {
   value       = aws_glue_job.fraud_detection.name
 }
 
+output "glue_database_name" {
+  description = "Name of the Glue database"
+  value       = aws_glue_catalog_database.fraud_detection_db.name
+}
+
+output "glue_crawler_name" {
+  description = "Name of the Glue crawler"
+  value       = aws_glue_crawler.transaction_crawler.name
+}
+
 output "glue_role_arn" {
   description = "ARN of the Glue IAM role"
   value       = aws_iam_role.glue_role.arn
