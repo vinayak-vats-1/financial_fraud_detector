@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FraudInvestigator AI Assistant (Local)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: #1f2937; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .query-box { margin: 20px 0; }
+        button { padding: 10px 20px; font-size: 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; margin: 5px; }
+        button:hover { background: #2563eb; }
+        .response { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 4px; margin: 10px 0; white-space: pre-line; }
+        .examples { background: #fef3c7; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .demo-buttons { display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 FraudInvestigator AI Assistant</h1>
+        <p>Demo version with sample responses</p>
+    </div>
+
+    <div class="examples">
+        <h3>Click any button below to see sample AI responses:</h3>
+    </div>
+
+    <div class="demo-buttons">
+        <button onclick="showResponse('top2')">Top 2 Anomalous Transactions</button>
+        <button onclick="showResponse('customers')">Highest Risk Customers</button>
+        <button onclick="showResponse('explain')">Explain Transaction TXN999004</button>
+        <button onclick="showResponse('summary')">Fraud Summary</button>
+        <button onclick="showResponse('count')">Alert Count</button>
+    </div>
+
+    <div id="response" class="response" style="display: none;"></div>
+
+    <script>
+        const responses = {
+            'top2': {
+                query: "Show me the top 2 anomalous transactions",
+                response: `Top 2 most anomalous transactions:
+
+1. TXN999004 - Score: 5.7 - $50,000.00
+   Customer: CUST9004
+   Time: 2025-01-14 03:22:18
+
+2. TXN999002 - Score: 4.1 - $25,000.50
+   Customer: CUST9002
+   Time: 2025-01-15 02:30:45`
+            },
+            'customers': {
+                query: "List customers with highest fraud scores",
+                response: `Customers with highest fraud scores:
+
+• CUST9004: 5.7 (Critical Risk)
+• CUST9002: 4.1 (High Risk)
+• CUST9005: 3.9 (High Risk)
+• CUST9001: 3.2 (Moderate Risk)
+• CUST9003: 2.8 (Moderate Risk)`
+            },
+            'explain': {
+                query: "Explain why transaction TXN999004 was flagged",
+                response: `Transaction TXN999004 was flagged because:
+
+• Anomaly Score: 5.7 (>2.5 threshold)
+• Transaction Amount: $50,000.00
+• Customer: CUST9004
+• Transaction Time: 2025-01-14 03:22:18
+
+🚨 CRITICAL RISK: Extremely unusual pattern
+💰 Large transaction amount increases fraud risk
+🌙 Unusual transaction time (late night/early morning)`
+            },
+            'summary': {
+                query: "Give me fraud summary",
+                response: `FRAUD DETECTION SUMMARY:
+
+📊 Total Fraud Alerts: 5
+👥 Unique Customers Affected: 5
+💰 Total Amount at Risk: $111,251.50
+📈 Average Transaction: $22,250.30
+⚠️ Average Risk Score: 3.9
+🚨 Highest Risk Score: 5.7
+
+RISK DISTRIBUTION:
+🔴 Critical (>5.0): 1 alert
+🟠 High (4.0-5.0): 1 alert
+🟡 Moderate (2.5-4.0): 3 alerts`
+            },
+            'count': {
+                query: "How many fraud alerts do we have?",
+                response: `Current fraud alert status:
+
+📋 Total Alerts: 5 suspicious transactions
+🚨 Highest Risk: TXN999004 (Score: 5.7)
+💰 Total at Risk: $111,251.50
+📅 Latest Alert: 2025-01-15 23:45:12
+
+System is actively monitoring for new anomalies.`
+            }
+        };
+
+        function showResponse(type) {
+            const responseDiv = document.getElementById('response');
+            const data = responses[type];
+            
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = `<strong>Query:</strong> ${data.query}
+
+<strong>🤖 AI Response:</strong>
+${data.response}`;
+        }
+    </script>
+
+    <div style="margin-top: 40px; padding: 20px; background: #f0f9ff; border-radius: 8px;">
+        <h3>💡 How to Use the Real AI Assistant:</h3>
+        <p><strong>Option 1:</strong> AWS Lambda Console → Search "fraud-investigator" → Test with JSON queries</p>
+        <p><strong>Option 2:</strong> Use curl command:</p>
+        <code style="background: #e5e7eb; padding: 10px; display: block; margin: 10px 0;">
+curl -X POST https://cn4yjqa6ni.execute-api.us-east-1.amazonaws.com/prod/query -H "Content-Type: application/json" -d '{"query": "Show me fraud summary"}'
+        </code>
+        <p><strong>Option 3:</strong> Try the web version again (CORS should be fixed now)</p>
+    </div>
+</body>
+</html>
