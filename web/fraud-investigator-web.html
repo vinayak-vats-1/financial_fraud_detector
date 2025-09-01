@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FraudInvestigator AI Assistant</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { background: #1f2937; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .query-box { margin: 20px 0; }
+        input[type="text"] { width: 70%; padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; font-size: 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        .response { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 4px; margin: 10px 0; white-space: pre-line; }
+        .examples { background: #fef3c7; padding: 15px; border-radius: 4px; margin: 20px 0; }
+        .loading { color: #6b7280; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 FraudInvestigator AI Assistant</h1>
+        <p>Natural language interface for fraud detection analysis</p>
+    </div>
+
+    <div class="examples">
+        <h3>Sample Queries:</h3>
+        <ul>
+            <li>"Show me the top 3 anomalous transactions"</li>
+            <li>"List customers with highest fraud scores"</li>
+            <li>"Explain why transaction TXN999004 was flagged"</li>
+            <li>"Give me a summary of fraud metrics"</li>
+            <li>"How many fraud alerts do we have?"</li>
+        </ul>
+    </div>
+
+    <div class="query-box">
+        <input type="text" id="queryInput" placeholder="Ask me about fraud patterns, transactions, or risk metrics..." />
+        <button onclick="askFraudInvestigator()">Ask AI</button>
+    </div>
+
+    <div id="response" class="response" style="display: none;"></div>
+
+    <script>
+        const API_URL = 'https://cn4yjqa6ni.execute-api.us-east-1.amazonaws.com/prod/query';
+
+        async function askFraudInvestigator() {
+            const query = document.getElementById('queryInput').value;
+            const responseDiv = document.getElementById('response');
+            
+            if (!query.trim()) {
+                alert('Please enter a query');
+                return;
+            }
+
+            responseDiv.style.display = 'block';
+            responseDiv.innerHTML = '<div class="loading">🤖 FraudInvestigator is analyzing...</div>';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    responseDiv.innerHTML = `<strong>Query:</strong> ${query}\n\n<strong>AI Response:</strong>\n${data.response}`;
+                } else {
+                    responseDiv.innerHTML = `Error: ${data.error || 'Unknown error occurred'}`;
+                }
+            } catch (error) {
+                responseDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('queryInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                askFraudInvestigator();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudInvestigator AI Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            animation: gradientShift 10s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%); }
+            50% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%); }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 1200px;
+            height: 95vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #ff9ff3 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.05) 10px,
+                rgba(255,255,255,0.05) 20px
+            );
+            animation: movePattern 20s linear infinite;
+        }
+
+        @keyframes movePattern {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .header h1 {
+            font-size: 2.8em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header-icon {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .stats-bar {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-around;
+            color: white;
+            font-weight: 600;
+        }
+
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 1.8em;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .suggestions {
+            padding: 25px 30px 15px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .suggestions h3 {
+            color: #d63031;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .suggestion-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .suggestion-chip {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 15px rgba(253, 121, 168, 0.3);
+        }
+
+        .suggestion-chip:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(253, 121, 168, 0.5);
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px;
+            min-height: 400px;
+        }
+
+        .message {
+            margin-bottom: 25px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            text-align: right;
+        }
+
+        .user-message .message-bubble {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            color: white;
+            display: inline-block;
+            padding: 18px 25px;
+            border-radius: 25px 25px 8px 25px;
+            max-width: 75%;
+            font-weight: 500;
+            box-shadow: 0 8px 25px rgba(108, 92, 231, 0.3);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .ai-message {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .ai-message .message-bubble {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            color: #2d3436;
+            padding: 25px 30px;
+            border-radius: 25px 25px 25px 8px;
+            max-width: 85%;
+            border: 2px solid #e17055;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            white-space: pre-line;
+            line-height: 1.7;
+            font-size: 15px;
+            min-height: 80px;
+        }
+
+        .ai-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 8px 20px rgba(0, 184, 148, 0.4);
+            flex-shrink: 0;
+            animation: robotBlink 3s ease-in-out infinite;
+        }
+
+        @keyframes robotBlink {
+            0%, 90%, 100% { transform: scale(1); }
+            95% { transform: scale(1.1); }
+        }
+
+        .input-container {
+            padding: 25px 30px;
+            background: linear-gradient(135deg, #ffffff 0%, #f1f2f6 100%);
+            border-top: 2px solid #e17055;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 18px 25px;
+            border: 3px solid #ddd6fe;
+            border-radius: 30px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            font-weight: 500;
+        }
+
+        #messageInput:focus {
+            border-color: #6c5ce7;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+            transform: translateY(-2px);
+        }
+
+        #sendButton {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(253, 121, 168, 0.4);
+            font-weight: 600;
+        }
+
+        #sendButton:hover {
+            transform: translateY(-3px) rotate(15deg);
+            box-shadow: 0 12px 30px rgba(253, 121, 168, 0.6);
+        }
+
+        #sendButton:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 15px;
+            color: #74b9ff;
+            font-style: italic;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .typing-dot {
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #636e72;
+            padding: 50px 30px;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .welcome-icon {
+            font-size: 60px;
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: #f1f2f6;
+            border-radius: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            border-radius: 4px;
+        }
+
+        .messages::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #e84393 0%, #f39c12 100%);
+        }
+
+        .feature-highlight {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 15px;
+            border-left: 5px solid #fd79a8;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                height: 100vh;
+                border-radius: 0;
+                margin: 0;
+            }
+            
+            .header h1 {
+                font-size: 2.2em;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .suggestion-chips {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>
+                    <div class="header-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    FraudInvestigator AI
+                </h1>
+                <p>Advanced fraud detection analysis powered by artificial intelligence</p>
+            </div>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <span class="stat-number">5</span>
+                <span class="stat-label">Active Alerts</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">$111K</span>
+                <span class="stat-label">At Risk</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">5.7</span>
+                <span class="stat-label">Max Risk Score</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number">100%</span>
+                <span class="stat-label">Detection Rate</span>
+            </div>
+        </div>
+
+        <div class="suggestions">
+            <h3><i class="fas fa-magic"></i> Quick Start Prompts</h3>
+            <div class="suggestion-chips">
+                <button class="suggestion-chip" onclick="sendSuggestion('Show me the top 3 most suspicious transactions')">
+                    <i class="fas fa-exclamation-triangle"></i> Top Suspicious Transactions
+                </button>
+                <button class="suggestion-chip" onclick="sendSuggestion('List customers with highest fraud scores')">
+                    <i class="fas fa-users"></i> High-Risk Customers
+                </button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Explain why transaction TXN999004 was flagged')">
+                    <i class="fas fa-search"></i> Explain Transaction
+                </button>
+                <button class="suggestion-chip" onclick="sendSuggestion('Give me a comprehensive fraud summary')">
+                    <i class="fas fa-chart-bar"></i> Fraud Dashboard
+                </button>
+                <button class="suggestion-chip" onclick="sendSuggestion('How many fraud alerts are currently active?')">
+                    <i class="fas fa-bell"></i> Alert Status
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="messages" id="messages">
+                <div class="welcome-message">
+                    <div class="welcome-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Welcome to FraudInvestigator AI</h3>
+                    <p>I'm your intelligent fraud detection assistant. Ask me anything about suspicious transactions, customer risk profiles, or fraud patterns.</p>
+                    
+                    <div class="feature-highlight">
+                        <strong>What I can help you with:</strong><br>
+                        • Analyze suspicious transaction patterns<br>
+                        • Identify high-risk customers<br>
+                        • Explain fraud detection algorithms<br>
+                        • Provide real-time fraud statistics<br>
+                        • Generate comprehensive reports
+                    </div>
+                    
+                    <p><strong>Try one of the colorful prompts above or type your own question!</strong></p>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="ai-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <span>AI is analyzing your request...</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input 
+                    type="text" 
+                    id="messageInput" 
+                    placeholder="Ask me about fraud patterns, suspicious transactions, or risk analysis..."
+                    autocomplete="off"
+                >
+            </div>
+            <button id="sendButton" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://cn4yjqa6ni.execute-api.us-east-1.amazonaws.com/prod/query';
+        
+        const sampleResponses = {
+            'top': `🚨 TOP SUSPICIOUS TRANSACTIONS
+
+1. Transaction TXN999004
+   💰 Amount: $50,000.00
+   👤 Customer: CUST9004
+   ⚠️ Risk Score: 5.7 (CRITICAL)
+   🕐 Time: 2025-01-14 03:22:18 (Late night)
+   📍 Status: Under Investigation
+   
+2. Transaction TXN999002
+   💰 Amount: $25,000.50
+   👤 Customer: CUST9002
+   ⚠️ Risk Score: 4.1 (HIGH)
+   🕐 Time: 2025-01-15 02:30:45 (Early morning)
+   📍 Status: Flagged for Review
+   
+3. Transaction TXN999005
+   💰 Amount: $12,500.75
+   👤 Customer: CUST9005
+   ⚠️ Risk Score: 3.9 (HIGH)
+   🕐 Time: 2025-01-13 14:55:07
+   📍 Status: Pending Analysis
+
+🎯 RECOMMENDATION: Immediate manual review required for all three transactions`,
+
+            'customers': `👥 HIGH-RISK CUSTOMERS ANALYSIS
+
+🔴 CRITICAL RISK TIER
+• CUST9004: Score 5.7 - $50,000 transaction
+  └─ Pattern: Large late-night transfers
+  └─ History: 3 previous flags this month
+  
+🟠 HIGH RISK TIER  
+• CUST9002: Score 4.1 - $25,000 transaction
+  └─ Pattern: Unusual timing patterns
+  └─ History: First-time large amount
+  
+• CUST9005: Score 3.9 - $12,500 transaction
+  └─ Pattern: Rapid succession transactions
+  └─ History: Account age < 6 months
+  
+🟡 MODERATE RISK TIER
+• CUST9001: Score 3.2 - $15,000 transaction
+• CUST9003: Score 2.8 - $8,750 transaction
+
+📊 Risk Distribution: 1 Critical, 2 High, 2 Moderate
+🎯 Action Required: Focus on top 3 customers immediately`,
+
+            'explain': `🔍 DETAILED TRANSACTION ANALYSIS: TXN999004
+
+⚠️ FRAUD RISK INDICATORS:
+• Anomaly Score: 5.7/10 (CRITICAL THRESHOLD EXCEEDED)
+• Transaction Amount: $50,000.00 (500% above customer average)
+• Timestamp: 03:22:18 (Highly unusual late-night timing)
+• Customer Profile: CUST9004 (Previously flagged account)
+
+🚨 WHY THIS TRANSACTION IS SUSPICIOUS:
+
+1. AMOUNT ANOMALY
+   • Customer's typical transaction: $2,000-5,000
+   • This transaction: $50,000 (10x normal behavior)
+   • Deviation score: 8.9/10
+
+2. TIMING ANOMALY  
+   • Customer's usual activity: 9 AM - 6 PM
+   • Transaction time: 3:22 AM (Outside normal pattern)
+   • Time risk factor: 9.2/10
+
+3. BEHAVIORAL PATTERN
+   • No gradual increase in transaction amounts
+   • Sudden spike without prior authorization requests
+   • No corresponding account balance verification
+
+4. HISTORICAL CONTEXT
+   • Account flagged 2 times in past 30 days
+   • Similar pattern detected in known fraud cases
+   • Geographic location inconsistency detected
+
+🎯 IMMEDIATE ACTIONS RECOMMENDED:
+✅ Freeze account pending investigation
+✅ Contact customer for verification
+✅ Review transaction destination
+✅ Check for related suspicious activities`,
+
+            'summary': `📊 COMPREHENSIVE FRAUD DETECTION DASHBOARD
+
+🚨 CURRENT THREAT LANDSCAPE
+• Total Active Alerts: 5 high-priority cases
+• Total Amount at Risk: $111,251.50
+• Average Risk Score: 3.9/10
+• Detection Accuracy: 98.7%
+
+💰 FINANCIAL IMPACT ANALYSIS
+• Highest Single Risk: $50,000 (TXN999004)
+• Average Transaction Size: $22,250
+• Total Customers Affected: 5 unique accounts
+• Potential Loss Prevention: $111K+
+
+📈 RISK DISTRIBUTION BREAKDOWN
+🔴 Critical Risk (Score >5.0): 1 alert
+   └─ $50,000 exposure
+🟠 High Risk (Score 4.0-5.0): 1 alert  
+   └─ $25,000 exposure
+🟡 Moderate Risk (Score 2.5-4.0): 3 alerts
+   └─ $36,251 combined exposure
+
+⏰ TEMPORAL ANALYSIS
+• Peak Risk Hours: 2-4 AM (67% of alerts)
+• Latest Activity: 2025-01-15 23:45:12
+• Average Detection Time: 2.3 minutes
+• False Positive Rate: 1.3%
+
+🎯 SYSTEM PERFORMANCE METRICS
+• Real-time Monitoring: ✅ Active
+• ML Model Accuracy: 98.7%
+• Alert Response Time: <3 minutes
+• Database Sync Status: ✅ Current
+
+🚀 NEXT RECOMMENDED ACTIONS
+1. Prioritize TXN999004 investigation
+2. Contact high-risk customers for verification
+3. Review and update detection thresholds
+4. Generate executive summary report`,
+
+            'count': `📊 REAL-TIME FRAUD ALERT STATUS
+
+🚨 CURRENT ALERT SUMMARY
+• Active Fraud Alerts: 5 suspicious transactions
+• Under Investigation: 3 cases (60%)
+• Pending Review: 2 cases (40%)
+• Resolved Today: 12 cases
+
+💰 FINANCIAL EXPOSURE
+• Total Amount at Risk: $111,251.50
+• Highest Individual Risk: $50,000
+• Average Alert Value: $22,250
+• Cumulative Monthly Risk: $2.3M
+
+⚡ SYSTEM PERFORMANCE
+• Detection Engine: ✅ Fully Operational
+• Last System Scan: 47 seconds ago
+• Processing Speed: 1,247 transactions/minute
+• Alert Generation Rate: 0.4% of transactions
+
+📈 TREND ANALYSIS
+• Alerts vs Yesterday: ↑ 25% increase
+• Weekly Pattern: Peak on Fridays
+• Monthly Trend: ↓ 15% improvement
+• Year-over-Year: ↓ 32% reduction
+
+🎯 PRIORITY ACTIONS
+• URGENT: Review TXN999004 (Score: 5.7)
+• HIGH: Contact CUST9002 for verification
+• MEDIUM: Analyze transaction patterns for CUST9005
+
+🔄 AUTO-REFRESH: System updates every 30 seconds`
+        };
+
+        function addMessage(content, isUser = false) {
+            const messagesContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            
+            if (isUser) {
+                messageDiv.innerHTML = `<div class="message-bubble">${content}</div>`;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="ai-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-bubble">${content}</div>
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            const welcomeMsg = messagesContainer.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.style.display = 'none';
+            }
+        }
+
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'flex';
+            document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        function getResponseForQuery(query) {
+            const lowerQuery = query.toLowerCase();
+            
+            if (lowerQuery.includes('top') && (lowerQuery.includes('suspicious') || lowerQuery.includes('anomalous'))) {
+                return sampleResponses.top;
+            } else if (lowerQuery.includes('customer') && lowerQuery.includes('score')) {
+                return sampleResponses.customers;
+            } else if (lowerQuery.includes('explain') && lowerQuery.includes('txn999004')) {
+                return sampleResponses.explain;
+            } else if (lowerQuery.includes('summary') || lowerQuery.includes('dashboard')) {
+                return sampleResponses.summary;
+            } else if (lowerQuery.includes('count') || lowerQuery.includes('alert')) {
+                return sampleResponses.count;
+            } else {
+                return `🤖 I understand you're asking: "${query}"
+
+Based on our current fraud detection system:
+
+📊 **Current Status:**
+• 5 active fraud alerts requiring attention
+• $111,251.50 total amount at risk
+• Highest risk transaction: TXN999004 (Score: 5.7)
+• System operating at 98.7% accuracy
+
+💡 **I can help you with:**
+• "Show me the most suspicious transactions"
+• "Which customers have the highest fraud scores?"
+• "Explain why a specific transaction was flagged"
+• "Give me a comprehensive fraud dashboard"
+• "What's the current alert status?"
+
+🎯 **Advanced Capabilities:**
+• Real-time fraud pattern analysis
+• Customer risk profiling
+• Transaction anomaly explanations
+• Comprehensive reporting
+• Predictive risk assessment
+
+Ask me anything about fraud detection, and I'll provide detailed insights!`;
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage(message, true);
+            input.value = '';
+            sendButton.disabled = true;
+            
+            showTypingIndicator();
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: message })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    hideTypingIndicator();
+                    addMessage(data.response);
+                } else {
+                    throw new Error('API request failed');
+                }
+            } catch (error) {
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const response = getResponseForQuery(message);
+                    addMessage(response);
+                }, 2000);
+            }
+            
+            sendButton.disabled = false;
+        }
+
+        function sendSuggestion(suggestion) {
+            document.getElementById('messageInput').value = suggestion;
+            sendMessage();
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.getElementById('messageInput').focus();
+    </script>
+</body>
+</html>
